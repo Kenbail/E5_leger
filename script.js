@@ -10,9 +10,10 @@ var memoire_carte_2 = ""
 var liste = []
 var compteur = 0
 var noclick
+var Images = []
 var memo_diff
-var Images
 var liste2 = []
+var backgroundImage = []
 
 $(document).ready(function () {
     $('#Victoire').hide()
@@ -21,8 +22,25 @@ $(document).ready(function () {
 });
 /* boutton difficulter choisis, création grille de jeu */
 $(".lancer_party").on("click", function () {
+    $.ajax({
+        type: 'GET',
+        url: 'charge_image.php',
+        dataType: 'json',
+        success: function (data) {
+            $.each(data, function (index, base64String) {
+                var img = $("<img>").attr({ src: "data:image/jpeg;base64," + base64String, id: "photo" + i });
+                $("#storage").append(img);
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
+
+
+
     $("#tableau").hide()
-    Images = ["images/humain/alexou.jpg", "images/humain/gaia.jpg", "images/humain/Jesse_Pinkman2.png", "images/humain/lucas.jpg", "images/humain/QCOCO.jpeg", "images/humain/zneo.jpg", "images/humain/max-taylor-lifts-2.jpg", "images/humain/robin.jpg"]
+
 
     memo_diff = $(this)
     col_lign = $(this).text().split('X')
@@ -53,18 +71,24 @@ $(".lancer_party").on("click", function () {
     $('#grille_jeu').append(content);
     content = ""
 
-    for (i = 0; i < colonne; i++) {
-        for (x = 0; x < ligne; x++) {
-            $("div[name=" + liste2[0] + "] .flip-card-back").css('background-image', 'url(' + Images[liste2[0]] + ')');
-            $("div[name=" + liste2[0] + "] .flip-card-back").css('background-repeat', 'no-repeat')
-            $("div[name=" + liste2[0] + "] .flip-card-back").css('background-size', 'cover')
-            liste2.shift()
+    setTimeout(function () {
+        $("img[id^=photo]").each(function () {
+            backgroundImage.push("url(" + $(this).attr("src") + ")");
+        })
+        console.log(backgroundImage)
+        for (i = 0; i < colonne; i++) {
+            for (x = 0; x < ligne; x++) {
+                $("div[name=" + liste2[0] + "] .flip-card-back").css("background-image", backgroundImage[liste2[0]])
+                $("div[name=" + liste2[0] + "] .flip-card-back").css('background-repeat', 'no-repeat')
+                $("div[name=" + liste2[0] + "] .flip-card-back").css('background-size', 'cover')
+                liste2.shift()
+            }
         }
-    }
-
-
-
+    }, 500);
 })
+
+
+
 /* quand on retourne les cartes */
 $('#grille_jeu').on('click', '.flip-card-inner', function () {
     if ($(this).parent().hasClass('flip') || noclick == 1) {
@@ -76,8 +100,6 @@ $('#grille_jeu').on('click', '.flip-card-inner', function () {
         } else {
             memoire_carte_2 = $(this).parent()
             carte_2 = $(this).parent().attr("name")
-            console.log(carte_1)
-            console.log(carte_2)
             if (carte_1 == carte_2) {
                 memoire_carte_1 = ""
                 memoire_carte_2 = ""
@@ -124,12 +146,17 @@ $('#rejouerD').on('click', function () {
     $("#Victoire").hide()
     $("#tableau").show()
     memo_diff = ""
+    backgroundImage = []
+    $("#storage").empty()
 })
 $('#rejouer').on('click', function () {
     $("#Victoire").hide()
     memo_diff.trigger("click")
+    backgroundImage = []
+    $("#storage").empty()
 
 })
+
 
 /*mélanger le tableau*/
 function shuffle(array) {
