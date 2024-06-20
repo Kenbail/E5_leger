@@ -8,11 +8,13 @@ $username = "root";
 $password = "";
 $dbname = "e5_leger";
 
+$id_rechercher = $_GET["id"];
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 $images = array(); // tableau pour stocker les données des images
 
 // requête SQL pour récupérer les données des images
-$query = "SELECT id, Image,id_banque FROM banque_image";
+$query = "SELECT id, Image,id_banque FROM banque_image where id_banque = $id_rechercher";
 $result = mysqli_query($conn, $query);
 
 while ($row = mysqli_fetch_assoc($result)) {
