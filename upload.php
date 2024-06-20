@@ -59,3 +59,6 @@ if ($row['nb_banque'] > 0) {
 // Préparation de la requête SQL
 $stmt = $pdo->prepare("INSERT INTO banque_image (id_banque, Createur, nom_banque, Image) VALUES (?,?,?,?)");
 $stmt->execute([$id_banque, $createur, $nom_banque, base64_encode($filecontent)]);
+
+
+header('Location: creation_banque.php');
